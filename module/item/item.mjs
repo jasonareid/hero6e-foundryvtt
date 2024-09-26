@@ -9,9 +9,9 @@ import {
     determineMaxAdjustment,
 } from "../utility/adjustment.mjs";
 import { onActiveEffectToggle } from "../utility/effects.mjs";
-import { getPowerInfo, getModifierInfo, whisperUserTargetsForActor } from "../utility/util.mjs";
+import { getModifierInfo, getPowerInfo, whisperUserTargetsForActor } from "../utility/util.mjs";
 import { RoundFavorPlayerDown, RoundFavorPlayerUp } from "../utility/round.mjs";
-import { convertToDcFromItem, getDiceFormulaFromItemDC, CombatSkillLevelsForAttack } from "../utility/damage.mjs";
+import { CombatSkillLevelsForAttack, convertToDcFromItem, getDiceFormulaFromItemDC } from "../utility/damage.mjs";
 import { getSystemDisplayUnits } from "../utility/units.mjs";
 import { calculateVelocityInSystemUnits } from "../ruler.mjs";
 import { HeroRoller } from "../utility/dice.mjs";
@@ -653,7 +653,7 @@ export class HeroSystem6eItem extends Item {
     static ItemXmlTags = ["SKILLS", "PERKS", "TALENTS", "MARTIALARTS", "POWERS", "DISADVANTAGES", "EQUIPMENT"];
     static ItemXmlChildTags = ["ADDER", "MODIFIER", "POWER"];
 
-    static ItemXmlChildTagsUpload = ["ADDER", "MODIFIER", "POWER", "SKILL", "PERK", "TALENT"];
+    static ItemXmlChildTagsUpload = ["ADDER", "MODIFIER", "POWER", "SKILL", "PERK", "TALENT", "MANEUVER"];
 
     findModsByXmlid(xmlid) {
         for (const key of HeroSystem6eItem.ItemXmlChildTags) {
@@ -811,13 +811,19 @@ export class HeroSystem6eItem extends Item {
         return changed;
     }
 
+    #baseInfo = null;
     // An attempt to cache getPowerInfo for performance reasons.
-    #baseInfo = getPowerInfo({ item: this });
     getBaseInfo() {
         console.warn("Use baseInfo instead of getBaseInfo");
+        if (!this.#baseInfo) {
+            this.#baseInfo = getPowerInfo({ item: this });
+        }
         return this.#baseInfo;
     }
     get baseInfo() {
+        if (!this.#baseInfo) {
+            this.#baseInfo = getPowerInfo({ item: this });
+        }
         return this.#baseInfo;
     }
 
@@ -2018,6 +2024,12 @@ export class HeroSystem6eItem extends Item {
         return results;
     }
 
+    static itemDataType(system, actor) {
+        const powerInfo = getPowerInfo({ item: { system }, actor: actor });
+        if (powerInfo?.type.includes("maneuver")) return "maneuver";
+        return "power";
+    }
+
     static itemDataFromXml(xml, actor) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "text/xml");
@@ -2055,9 +2067,7 @@ export class HeroSystem6eItem extends Item {
                     : [heroJson[itemSubTag]]) {
                     itemData = {
                         name: system?.ALIAS || system?.XMLID || itemTag, // simplistic name for now
-                        type: powerList.filter((o) => o.type?.includes("characteristic")).map((o) => o.key)
-                            ? "power"
-                            : itemTag.toLowerCase().replace(/s$/, ""),
+                        type: HeroSystem6eItem.itemDataType(system, actor),
                         system: { ...system, is5e: itemData.system.is5e },
                     };
 

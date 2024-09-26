@@ -1662,34 +1662,39 @@ export class HeroSystem6eActor extends Actor {
                 .forEach(async (maneuver) => {
                     const name = maneuver.name;
                     const XMLID = maneuver.key;
-
                     const maneuverDetails = maneuver.maneuverDesc;
-                    const PHASE = maneuverDetails.phase;
-                    const OCV = maneuverDetails.ocv;
-                    const DCV = maneuverDetails.dcv;
-                    const EFFECT = maneuverDetails.effects;
 
-                    const itemData = {
-                        name,
-                        type: "maneuver",
-                        system: {
-                            PHASE,
-                            OCV,
-                            DCV,
-                            EFFECT,
-                            active: false, // TODO: This is probably not always true. It should, however, be generated in other means.
-                            description: EFFECT,
-                            XMLID,
-                            // MARTIALARTS consises of a list of MANEUVERS, the MARTIALARTS MANEUVERS have more props than our basic ones.
-                            // Adding in some of those props as we may enhance/rework the basic maneuvers in the future.
-                            //  <MANEUVER XMLID="MANEUVER" ID="1705867725258" BASECOST="4.0" LEVELS="0" ALIAS="Block" POSITION="1"
-                            //  MULTIPLIER="1.0" GRAPHIC="Burst" COLOR="255 255 255" SFX="Default" SHOW_ACTIVE_COST="Yes"
-                            //  INCLUDE_NOTES_IN_PRINTOUT="Yes" NAME="" CATEGORY="Hand To Hand" DISPLAY="Martial Block" OCV="+2"
-                            //  DCV="+2" DC="0" PHASE="1/2" EFFECT="Block, Abort" ADDSTR="No" ACTIVECOST="20" DAMAGETYPE="0"
-                            //  MAXSTR="0" STRMULT="1" USEWEAPON="Yes" WEAPONEFFECT="Block, Abort">
-                            DISPLAY: name, // Not sure we should allow editing of basic maneuvers
-                        },
-                    };
+                    let itemData;
+                    if (maneuver.xml) {
+                        itemData = HeroSystem6eItem.itemDataFromXml(maneuver.xml, this);
+                    } else {
+                        const PHASE = maneuverDetails.phase;
+                        const OCV = maneuverDetails.ocv;
+                        const DCV = maneuverDetails.dcv;
+                        const EFFECT = maneuverDetails.effects;
+
+                        itemData = {
+                            name,
+                            type: "maneuver",
+                            system: {
+                                PHASE,
+                                OCV,
+                                DCV,
+                                EFFECT,
+                                active: false, // TODO: This is probably not always true. It should, however, be generated in other means.
+                                description: EFFECT,
+                                XMLID,
+                                // MARTIALARTS consises of a list of MANEUVERS, the MARTIALARTS MANEUVERS have more props than our basic ones.
+                                // Adding in some of those props as we may enhance/rework the basic maneuvers in the future.
+                                //  <MANEUVER XMLID="MANEUVER" ID="1705867725258" BASECOST="4.0" LEVELS="0" ALIAS="Block" POSITION="1"
+                                //  MULTIPLIER="1.0" GRAPHIC="Burst" COLOR="255 255 255" SFX="Default" SHOW_ACTIVE_COST="Yes"
+                                //  INCLUDE_NOTES_IN_PRINTOUT="Yes" NAME="" CATEGORY="Hand To Hand" DISPLAY="Martial Block" OCV="+2"
+                                //  DCV="+2" DC="0" PHASE="1/2" EFFECT="Block, Abort" ADDSTR="No" ACTIVECOST="20" DAMAGETYPE="0"
+                                //  MAXSTR="0" STRMULT="1" USEWEAPON="Yes" WEAPONEFFECT="Block, Abort">
+                                DISPLAY: name, // Not sure we should allow editing of basic maneuvers
+                            },
+                        };
+                    }
 
                     if (!itemData.name) {
                         console.error("Missing name", itemData);

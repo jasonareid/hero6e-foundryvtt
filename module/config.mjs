@@ -1151,12 +1151,9 @@ function addPower(powerDescription6e, powerOverrideFor5e) {
             costEnd: false,
             ignoreFor: ["base2", "computer", "ai"],
             maneuverDesc: {
-                phase: "1/2 *",
-                ocv: "+0",
-                dcv: "-5",
-                effects: "+4 Damage Classes to any attack",
                 attack: false,
             },
+            xml: '<MANEUVER XMLID="HAYMAKER" BASECOST="1.0" LEVELS="0" ALIAS="Haymaker" POSITION="0" MULTIPLIER="1.0" GRAPHIC="Burst" SFX="Default" SHOW_ACTIVE_COST="Yes" INCLUDE_NOTES_IN_PRINTOUT="Yes" NAME="" CUSTOM="Yes" CATEGORY="Hand to Hand" DISPLAY="Custom Maneuver" OCV="+0" DCV="-5" DC="4" PHASE="1/2" EFFECT="+4 Damage Classes to any attack" ADDSTR="Yes" ACTIVECOST="0" DAMAGETYPE="2" MAXSTR="0" STRMULT="1" USEWEAPON="No"><NOTES /></MANEUVER>',
         },
         {},
     );
